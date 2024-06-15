@@ -4,11 +4,7 @@ import { PrismaClient } from "@prisma/client";
 
 @Module({
     providers: [PrismaService], // declara que prisma service faz parte deste modulo
-    exports: [PrismaModule] // exporta pra que seja usado em outros lugares
+    exports: [PrismaService] // exporta pra que seja usado em outros lugares
 })
 
-export class PrismaModule {
-
-
-
-}
+export class PrismaModule {}
