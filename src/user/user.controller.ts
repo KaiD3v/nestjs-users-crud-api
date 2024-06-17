@@ -1,8 +1,8 @@
 import { UserService } from './user.service';
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put } from "@nestjs/common";
 import { CreateUserDTO } from "./dto/create-user.dto";
-import { UpdatePutUserDTO } from "./dto/update-put-user.dto";
-import { UpdatePatchUserDTO } from "./dto/update-patch-user";
+import { UpdatePatchUserDTO } from './dto/update-patch-user.dto';
+import { UpdatePutUserDTO } from './dto/update-put-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -14,34 +14,25 @@ export class UserController {
         return this.userService.create(data);
     }
     @Get(':id')
-    async readOne(@Param() param){
-        return {user: {}, param}
+    async readOne(@Param('id') id: string) {
+        return this.userService.readOne(id);
     }
     @Get()
     async readAll(){
-        return {users: []}
+        return this.userService.readAll()
     }
     @Put(':id')
-    async update(@Body() {email, name, password}:UpdatePutUserDTO, @Param() param){
-        return {
-            method: 'put',
-            name, 
-            password,
-            param
-        }
+    async update(@Param('id') id:string, @Body() data:UpdatePutUserDTO){
+        return this.userService.update(id, data)
     }
     @Patch(':id')
-    async updatePartial(@Body() body:UpdatePatchUserDTO, @Param() param){
-        return{
-            method: 'patch',
-            body,
-            param
-        }
+    async updatePartial(@Body() data:UpdatePatchUserDTO, @Param('id') id:string){
+        return this.userService.updatePartial(id, data)
     }
     @Delete(':id')
-    async deleteUser(@Param('id', ParseIntPipe) id) {
-        return {
-            id
-        } 
+    async deleteUser(@Param('id') id: string) {
+        await this.userService.delete(id)
+
+        return {message: "Usuário deletado com sucesso!", id}
     }
 }
