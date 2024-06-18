@@ -1,10 +1,11 @@
 import { AuthService } from './auth.service';
 import { UserService } from './../user/user.service';
-import { BadRequestException, Body, Controller, Post } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Post, Headers, UseGuards } from "@nestjs/common";
 import { AuthLoginDTO } from "./dto/auth.dto";
 import { AuthRegisterDTO } from "./dto/auth-register.dto";
 import { AuthForgetDTO } from "./dto/auth-fotget.dto";
 import { AuthResetDTO } from "./dto/auth-reset.dto";
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller("auth")
 export class AuthController {
@@ -27,19 +28,12 @@ export class AuthController {
     async forget(@Body() {email}:AuthForgetDTO){
         return this.authService.forget(email)
     }
-    @Post('me')
-    async me(@Body() body) {
-        const token = body.token;
-        if (!token) {
-            throw new BadRequestException('Token is required');
-        }
 
-        try {
-            const user = await this.authService.checkToken(token);
-            return user;
-        } catch (error) {
-            throw new BadRequestException('Invalid token');
-        }
+    @UseGuards(AuthGuard)
+    @Post('me')
+    async me(@Headers("authorization") token) {
+        
+        return {me: 'ok'}
     }
 
     @Post('reset')

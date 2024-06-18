@@ -15,23 +15,19 @@ export class AuthService {
     ){}
 
     async createToken(user: User) {
-        const accessToken = this.JWTService.sign(
-            {
-                id: user.id,
-                name: user.name,
-                email: user.email
-            },
-            {
-                expiresIn: "7d",
-                subject: String(user.id),
-                issuer: "login",
-                audience: 'users'
-            }
-        );
-    
         return {
-            accessToken: `Bearer ${accessToken}`
-        };
+           accessToken: this.JWTService.sign({
+            id: user.id,
+            name: user.name, 
+            email: user.email 
+        }, 
+        {
+            expiresIn: "7d",
+            subject: String(user.id),
+            issuer: "login",
+            audience: 'users'
+        })
+        }
     }
 
     async checkToken (token: string) {
@@ -90,5 +86,14 @@ export class AuthService {
         })
 
         return true
+    }
+
+     isValidToken(token: string){
+        try {
+            this.checkToken(token)
+            return true
+        } catch (error) {
+            return false;            
+        }
     }
 }
