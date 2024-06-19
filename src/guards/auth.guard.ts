@@ -17,6 +17,8 @@ export class AuthGuard implements CanActivate {
     
         const data = await this.authService.checkToken((authorization ?? '').split(' ')[1])
         req.tokenPayLoad = data
+
+        req.user = await this.userService.readOne(data.id)
         
     return true;
     } catch (error) {
