@@ -1,10 +1,9 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AuthRegisterDTO } from "./dto/auth-register.dto";
 import { UserService } from "src/user/user.service";
-
+import { User } from "@prisma/client";
 
 @Injectable()
 export class AuthService {
@@ -30,12 +29,16 @@ export class AuthService {
         }
     }
 
-    async checkToken (token: string) {
-        return this.JWTService.verify(token, {
+    async checkToken(token: string) {
+        try {
+          return this.JWTService.verify(token, {
             audience: 'users',
             issuer: 'login'
-        })
-    }
+          });
+        } catch (error) {
+          throw new UnauthorizedException('Invalid token');
+        }
+      }
 
     async login (email: string, password: string) {
         const user = await this.prisma.user.findFirst({
@@ -43,27 +46,24 @@ export class AuthService {
                 email,
                 password
             }
-        })
+        });
 
         if(!user){
             throw new UnauthorizedException("E-mail ou senha incorretos.")
         }
 
-        return this.createToken(user)
+        return this.createToken(user);
     }
 
     async register(data: AuthRegisterDTO) {
-        const user = await this.userService.create(data)
-
+        const user = await this.userService.create(data);
         return this.createToken(user);
     }
 
     async forget(email: string){
         const user = await this.prisma.user.findFirst({
-            where: {
-                email
-            }
-        })
+            where: { email }
+        });
 
         if(!user){
             throw new UnauthorizedException("E-mail Incorreto.")
@@ -73,25 +73,19 @@ export class AuthService {
     }
 
     async reset(password:string, token: string){
-        
-        const id = '0'
-        
+        const id = '0'; 
         await this.prisma.user.update({
-            where: {
-                id,
-            },
-            data: {
-                password
-            }
-        })
+            where: { id },
+            data: { password }
+        });
 
-        return true
+        return true;
     }
 
-     isValidToken(token: string){
+    isValidToken(token: string){
         try {
-            this.checkToken(token)
-            return true
+            this.checkToken(token);
+            return true;
         } catch (error) {
             return false;            
         }

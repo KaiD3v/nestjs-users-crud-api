@@ -1,4 +1,4 @@
-import { HttpCode, Injectable, NotFoundException, ConflictException } from "@nestjs/common";
+import { Injectable, NotFoundException, ConflictException } from "@nestjs/common";
 import { CreateUserDTO } from "./dto/create-user.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UpdatePatchUserDTO } from "./dto/update-patch-user.dto";

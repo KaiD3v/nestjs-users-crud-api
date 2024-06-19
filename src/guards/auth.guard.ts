@@ -1,31 +1,27 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
-import { Observable } from "rxjs";
-import { AuthService } from "src/auth/auth.service";
-
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
+import { UnauthorizedException } from '@nestjs/common';
+import { AuthService } from '../auth/auth.service'
+import { UserService } from '../user/user.service'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
-    constructor(private readonly authService: AuthService) {}
-
-    async canActivate(context: ExecutionContext): Promise<boolean> {
-        const request = context.switchToHttp().getRequest();
-        const { authorization } = request.headers;
-
-        if (!authorization) {
-            throw new UnauthorizedException('Authorization header is missing');
-        }
-
-        const [authType, token] = authorization.split(' ');
-
-        if (authType !== 'Bearer' || !token) {
-            throw new UnauthorizedException('Invalid authorization format');
-        }
-
-        try {
-            return this.authService.isValidToken(token);
-        } catch (error) {
-            throw new UnauthorizedException('Invalid or expired token');
-        }
+  async canActivate(context: ExecutionContext): Promise<any> {
+    const req = await context.switchToHttp().getRequest()
+    const {authorization} = await req.headers
+    try {
+    
+        const data = await this.authService.checkToken((authorization ?? '').split(' ')[1])
+        req.tokenPayLoad = data
+        
+    return true;
+    } catch (error) {
+        return false
     }
+    
+  }
 }

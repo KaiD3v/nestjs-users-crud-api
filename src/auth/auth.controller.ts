@@ -1,6 +1,6 @@
 import { AuthService } from './auth.service';
 import { UserService } from './../user/user.service';
-import { BadRequestException, Body, Controller, Post, Headers, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Post, Headers, UseGuards, Req } from "@nestjs/common";
 import { AuthLoginDTO } from "./dto/auth.dto";
 import { AuthRegisterDTO } from "./dto/auth-register.dto";
 import { AuthForgetDTO } from "./dto/auth-fotget.dto";
@@ -31,9 +31,8 @@ export class AuthController {
 
     @UseGuards(AuthGuard)
     @Post('me')
-    async me(@Headers("authorization") token) {
-        
-        return {me: 'ok'}
+    async me(@Req() req:any) {
+        return { me: 'ok', data: req.tokenPayLoad };
     }
 
     @Post('reset')
