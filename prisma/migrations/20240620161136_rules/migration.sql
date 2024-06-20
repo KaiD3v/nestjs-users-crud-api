@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `User` ADD COLUMN `rule` INTEGER NOT NULL DEFAULT 1;

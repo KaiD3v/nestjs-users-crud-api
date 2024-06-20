@@ -42,12 +42,16 @@ export class UserService {
 
     async update(id: string, data: UpdatePutUserDTO) {
         await this.ensureUserExists(id);
+        const { email, name, password, rule } = data; 
         const updatedUser = await this.prisma.user.update({
             where: {
                 id,
             },
             data: {
-                ...data,
+                email,
+                name,
+                password,
+                rule,
             },
         });
         return updatedUser;

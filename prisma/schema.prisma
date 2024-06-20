@@ -18,6 +18,7 @@ model User {
   name      String
   email     String   @unique
   password  String
+  rule      Int      @default(1)
   createdAt DateTime @default(now()) @db.Timestamp(0)
   updatedAt DateTime @default(now()) @db.Timestamp(0)
 }
