@@ -3,23 +3,26 @@ import { CreateUserDTO } from "./dto/create-user.dto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UpdatePatchUserDTO } from "./dto/update-patch-user.dto";
 import { UpdatePutUserDTO } from "./dto/update-put-user.dto";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class UserService {
 
     constructor(private prisma: PrismaService) {}
 
-    async create({ email, name, password }: CreateUserDTO) {
-        const existingUser = await this.prisma.user.findUnique({ where: { email } });
+    async create(data: CreateUserDTO) {
+        const existingUser = await this.prisma.user.findUnique({ where: { email: data.email } });
         if (existingUser) {
-            throw new ConflictException(`User with email ${email} already exists`);
+            throw new ConflictException(`User with email ${data.email} already exists`);
         }
+
+        const salt = await bcrypt.genSalt();
+        console.log(salt);
+        data.password = await bcrypt.hash(data.password, salt);
 
         return this.prisma.user.create({
             data: {
-                name,
-                email,
-                password,
+                ...data
             },
         });
     }
@@ -42,28 +45,30 @@ export class UserService {
 
     async update(id: string, data: UpdatePutUserDTO) {
         await this.ensureUserExists(id);
-        const { email, name, password, rule } = data; 
+
+        if (data.password) {
+            const salt = await bcrypt.genSalt();
+            data.password = await bcrypt.hash(data.password, salt);
+        }
+
         const updatedUser = await this.prisma.user.update({
-            where: {
-                id,
-            },
-            data: {
-                email,
-                name,
-                password,
-                rule,
-            },
+            where: { id },
+            data: { ...data },
         });
         return updatedUser;
     }
 
     async updatePartial(id: string, data: UpdatePatchUserDTO) {
         await this.ensureUserExists(id);
+
+        if (data.password) {
+            const salt = await bcrypt.genSalt();
+            data.password = await bcrypt.hash(data.password, salt);
+        }
+
         const updatedUser = await this.prisma.user.update({
-            where: {
-                id,
-            },
-            data,
+            where: { id },
+            data: { ...data },
         });
         return updatedUser;
     }
@@ -71,9 +76,7 @@ export class UserService {
     async delete(id: string) {
         await this.ensureUserExists(id);
         return this.prisma.user.delete({
-            where: {
-                id,
-            },
+            where: { id },
         });
     }
 
