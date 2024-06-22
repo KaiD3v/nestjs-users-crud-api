@@ -8,6 +8,7 @@ import { LogIniterceptor } from 'src/interceptors/log.interceptor';
 import { Rules } from 'src/decorators/rules.decorator';
 import { Rule } from 'src/enums/rule.enum';
 import { RuleGuard } from 'src/guards/rule.guard';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @UseGuards(AuthGuard, RuleGuard)
 @Controller('users')
@@ -15,6 +16,7 @@ export class UserController {
 
     constructor(private readonly userService: UserService){}
    
+    @UseGuards(ThrottlerGuard)
     @Rules(Rule.Admin)
     @Post()
     async create(@Body() data:CreateUserDTO){
