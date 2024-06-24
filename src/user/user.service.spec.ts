@@ -89,9 +89,11 @@ describe('UserService', () => {
         test('should delete an existing user', async () => {
             const result = await userService.delete('0258360e-6d2e-496f-bb16-244ef588d4ca')
 
-            expect(prisma.user.delete).toHaveBeenCalledWith({
+            const resulted = expect(prisma.user.delete).toHaveBeenCalledWith({
                 where: {id: '0258360e-6d2e-496f-bb16-244ef588d4ca'}
             })
+
+            expect(resulted).toEqual(result)
         });
     });
 });
