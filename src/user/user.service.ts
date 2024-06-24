@@ -44,7 +44,6 @@ export class UserService {
     }
 
     async update(id: string, data: UpdatePutUserDTO) {
-        await this.ensureUserExists(id);
 
         if (data.password) {
             const salt = await bcrypt.genSalt();
@@ -59,7 +58,6 @@ export class UserService {
     }
 
     async updatePartial(id: string, data: UpdatePatchUserDTO) {
-        await this.ensureUserExists(id);
 
         if (data.password) {
             const salt = await bcrypt.genSalt();
@@ -74,16 +72,10 @@ export class UserService {
     }
 
     async delete(id: string) {
-        await this.ensureUserExists(id);
         return this.prisma.user.delete({
             where: { id },
         });
     }
 
-    private async ensureUserExists(id: string) {
-        const user = await this.readOne(id);
-        if (!user) {
-            throw new NotFoundException(`User with ID ${id} not found`);
-        }
-    }
+
 }
