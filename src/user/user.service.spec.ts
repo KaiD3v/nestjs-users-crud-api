@@ -8,7 +8,6 @@ import { UpdatePutUserDTO } from './dto/update-put-user.dto';
 
 describe('UserService', () => {
     let userService: UserService;
-    let updatePutUserDTO: UpdatePutUserDTO
     let prisma: PrismaService;
 
     beforeEach(async () => {
@@ -88,6 +87,11 @@ describe('UserService', () => {
 
     describe('Delete Method', () => {
         test('should delete an existing user', async () => {
+            const result = await userService.delete('0258360e-6d2e-496f-bb16-244ef588d4ca')
+
+            expect(prisma.user.delete).toHaveBeenCalledWith({
+                where: {id: '0258360e-6d2e-496f-bb16-244ef588d4ca'}
+            })
         });
     });
 });
